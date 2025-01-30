@@ -1,28 +1,48 @@
-name: Generate Episode List
+name: Update Episodes JSON
 
 on:
   push:
-    paths:
-      - 'episodes/*.mp3'
-
-permissions:
-  contents: write  # Grant write permission to the repository
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  update-episode-list:
+  update-episodes:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Generate JSON
+      - name: Generate episodes.json
         run: |
-          ls -t episodes/*.mp3 | awk -F '/' '{print "\"../" $NF "\""}' | jq -s '{episodes: .}' > episodes.json
+          echo "{" > episodes.json
+          echo '  "episodes": [' >> episodes.json
 
-      - name: Commit and Push
+          first_entry=true
+          for file in $(ls -t episodes/*.mp3); do
+            filename=$(basename "$file")
+            
+            # Extract title from filename: Remove leading number, replace dashes with spaces
+            title=$(echo "$filename" | sed -E 's/^[0-9]+-//; s/-/ /g; s/.mp3//')
+
+            # Add comma for JSON formatting except for the first entry
+            if [ "$first_entry" = false ]; then
+              echo "," >> episodes.json
+            else
+              first_entry=false
+            fi
+
+            echo "    {\"title\": \"$title\", \"file\": \"$filename\"}" >> episodes.json
+          done
+
+          echo "  ]" >> episodes.json
+          echo "}" >> episodes.json
+
+      - name: Commit and Push Changes
         run: |
           git config --global user.name "github-actions"
-          git config --global user.email "actions@github.com"
+          git config --global user.email "github-actions@github.com"
           git add episodes.json
-          git commit -m "Update episode list" || exit 0
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update episodes.json"
+          git push
