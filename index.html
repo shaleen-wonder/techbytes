@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podcast Player</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        .episode-list a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .episode-list a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container my-5">
+    <h1 class="text-center">Podcast Player</h1>
+
+    <!-- Latest Episode -->
+    <div class="card my-4">
+        <div class="card-body text-center">
+            <h2 class="card-title">Latest Episode</h2>
+            <audio id="player" controls class="plyr">
+                <source id="latest-episode" src="" type="audio/mpeg">
+            </audio>
+        </div>
+    </div>
+
+    <!-- Past Episodes -->
+    <h2 class="text-center">Past Episodes</h2>
+    <ul class="list-group episode-list" id="episode-list"></ul>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        fetch('episodes.json')
+            .then(response => response.json())
+            .then(data => {
+                let episodes = data.episodes;
+                if (episodes.length > 0) {
+                    let latestEpisode = "episodes/" + episodes[0];
+                    document.getElementById('latest-episode').src = latestEpisode;
+                    const player = new Plyr('#player');
+                }
+
+                let list = document.getElementById('episode-list');
+                episodes.slice(1).forEach(episode => {
+                    let li = document.createElement('li');
+                    li.classList.add("list-group-item");
+                    li.innerHTML = `<a href="episodes/${episode}" target="_blank">${episode.replace('.mp3', '')}</a>`;
+                    list.appendChild(li);
+                });
+            });
+    });
+</script>
+
+</body>
+</html>
