@@ -46,59 +46,62 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        fetch('episodes.json')
-            .then(response => response.json())
-            .then(data => {
-                let episodes = data.episodes;
-                const playerElement = document.getElementById('player');
-                const sourceElement = document.getElementById('latest-episode');
-                const list = document.getElementById('episode-list');
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('episodes.json')
+        .then(response => response.json())
+        .then(data => {
+            let episodes = data.episodes;
+            const playerElement = document.getElementById('player');
+            const sourceElement = document.getElementById('latest-episode');
+            const list = document.getElementById('episode-list');
 
-                // Debugging: Check the fetched episodes list
-                console.log("Fetched episodes:", episodes);
+            // Debugging: Check the fetched episodes list
+            console.log("Fetched episodes:", episodes);
 
-                // Sort episodes based on the numeric part of the filename
-                episodes.sort((a, b) => {
-                    const episodeA = parseInt(a.file.split('-')[0]); // Extract number
-                    const episodeB = parseInt(b.file.split('-')[0]); // Extract number
-                    return episodeA - episodeB;
-                });
+            // Sort episodes based on the numeric part of the filename
+            episodes.sort((a, b) => {
+                const episodeA = parseInt(a.file.split('-')[0]); // Extract number
+                const episodeB = parseInt(b.file.split('-')[0]); // Extract number
+                return episodeA - episodeB;
+            });
 
-                console.log("Sorted episodes:", episodes);
+            console.log("Sorted episodes:", episodes);
 
-                if (episodes.length > 0) {
-                    sourceElement.src = "episodes/" + episodes[0].file;
+            // Set the last episode as the latest episode
+            if (episodes.length > 0) {
+                const latestEpisode = episodes[episodes.length - 1].file;  // Get the last episode
+                console.log("Latest episode loaded:", latestEpisode); // Log the latest episode
+                sourceElement.src = "episodes/" + latestEpisode;
+                playerElement.load();
+                // playerElement.play(); // Auto-play latest episode (optional)
+            }
+
+            // Initialize Plyr AFTER setting the src
+            new Plyr(playerElement);
+
+            episodes.forEach((episode) => {
+                let li = document.createElement('li');
+                li.classList.add("list-group-item");
+                li.innerHTML = `<button class="btn btn-link episode-btn" data-src="episodes/${episode.file}">${episode.title}</button>`;
+                list.appendChild(li);
+
+                // Debugging: Check what episode buttons are being created
+                console.log("Added button for:", episode.file);
+            });
+
+            // Event delegation for better performance
+            list.addEventListener('click', (event) => {
+                if (event.target.classList.contains('episode-btn')) {
+                    let newSrc = event.target.getAttribute('data-src');
+                    console.log("Changing source to:", newSrc);
+                    sourceElement.src = newSrc;
                     playerElement.load();
-                    // playerElement.play(); // Auto-play latest episode
+                    playerElement.play();
                 }
-
-                // Initialize Plyr AFTER setting the src
-                new Plyr(playerElement);
-
-                episodes.forEach((episode) => {
-                    let li = document.createElement('li');
-                    li.classList.add("list-group-item");
-                    li.innerHTML = `<button class="btn btn-link episode-btn" data-src="episodes/${episode.file}">${episode.title}</button>`;
-                    list.appendChild(li);
-
-                    // Debugging: Check what episode buttons are being created
-                    console.log("Added button for:", episode.file);
-                });
-
-                // Event delegation for better performance
-                list.addEventListener('click', (event) => {
-                    if (event.target.classList.contains('episode-btn')) {
-                        let newSrc = event.target.getAttribute('data-src');
-                        console.log("Changing source to:", newSrc);
-                        sourceElement.src = newSrc;
-                        playerElement.load();
-                        playerElement.play();
-                    }
-                });
-            })
-            .catch(error => console.error("Error loading episodes:", error));
-    });
+            });
+        })
+        .catch(error => console.error("Error loading episodes:", error));
+});
 </script>
 </body>
 </html>
