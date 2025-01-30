@@ -47,28 +47,6 @@
 <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        fetch('episodes.json')
-            .then(response => response.json())
-            .then(data => {
-                let episodes = data.episodes;
-                if (episodes.length > 0) {
-                    let latestEpisode = "episodes/" + episodes[0];
-                    document.getElementById('latest-episode').src = latestEpisode;
-                    const player = new Plyr('#player');
-                }
-
-                let list = document.getElementById('episode-list');
-                episodes.slice(1).forEach(episode => {
-                    let li = document.createElement('li');
-                    li.classList.add("list-group-item");
-                    li.innerHTML = `<button class="btn btn-link episode-btn" data-src="episodes/${episode}">${episode.replace('.mp3', '')}</button>`;
-                    list.appendChild(li);
-                });
-            });
-    });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
     fetch('episodes.json')
         .then(response => response.json())
         .then(data => {
