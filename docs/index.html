@@ -6,7 +6,7 @@
 <body>
     <h1>Latest Episode</h1>
     <audio controls>
-        <source src="episodes/episode-01.mp3" type="audio/mpeg">
+        <source src="../episodes/episode-01.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
 
@@ -14,13 +14,13 @@
     <ul id="episode-list"></ul>
 
     <script>
-        fetch('episodes.json')
+        fetch('../episodes.json')
             .then(response => response.json())
             .then(data => {
                 let list = document.getElementById('episode-list');
                 data.episodes.forEach(episode => {
                     let li = document.createElement('li');
-                    li.innerHTML = `<a href="../episodes/${episode}">${episode}</a>`;
+                    li.innerHTML = `<a href="episodes/${episode}">${episode}</a>`;
                     list.appendChild(li);
                 });
             });
