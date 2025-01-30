@@ -1,6 +1,7 @@
 {
   "episodes": [
-    "../episode-02.mp3",
-    "../episode-01.mp3"
+    {"title": "Introduction to our podcast", "file": "01-Introduction-to-our-podcast.mp3"}
+,
+    {"title": "The second episode", "file": "02-The-second-episode.mp3"}
   ]
 }
