@@ -55,12 +55,17 @@
                 const sourceElement = document.getElementById('latest-episode');
                 const list = document.getElementById('episode-list');
 
+                // Debugging: Check the fetched episodes list
+                console.log("Fetched episodes:", episodes);
+
                 // Sort episodes based on the numeric part of the filename
                 episodes.sort((a, b) => {
-                    const episodeA = a.file.split('-')[0]; // Extract the number part (e.g., "01")
-                    const episodeB = b.file.split('-')[0]; // Extract the number part (e.g., "02")
-                    return parseInt(episodeA) - parseInt(episodeB); // Sort numerically
+                    const episodeA = parseInt(a.file.split('-')[0]); // Extract number
+                    const episodeB = parseInt(b.file.split('-')[0]); // Extract number
+                    return episodeA - episodeB;
                 });
+
+                console.log("Sorted episodes:", episodes);
 
                 if (episodes.length > 0) {
                     sourceElement.src = "episodes/" + episodes[0].file;
@@ -71,17 +76,22 @@
                 // Initialize Plyr AFTER setting the src
                 new Plyr(playerElement);
 
-                episodes.forEach(episode => {
+                episodes.forEach((episode) => {
                     let li = document.createElement('li');
                     li.classList.add("list-group-item");
                     li.innerHTML = `<button class="btn btn-link episode-btn" data-src="episodes/${episode.file}">${episode.title}</button>`;
                     list.appendChild(li);
+
+                    // Debugging: Check what episode buttons are being created
+                    console.log("Added button for:", episode.file);
                 });
 
                 // Event delegation for better performance
                 list.addEventListener('click', (event) => {
                     if (event.target.classList.contains('episode-btn')) {
-                        sourceElement.src = event.target.getAttribute('data-src');
+                        let newSrc = event.target.getAttribute('data-src');
+                        console.log("Changing source to:", newSrc);
+                        sourceElement.src = newSrc;
                         playerElement.load();
                         playerElement.play();
                     }
