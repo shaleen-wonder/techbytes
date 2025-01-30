@@ -61,11 +61,45 @@
                 episodes.slice(1).forEach(episode => {
                     let li = document.createElement('li');
                     li.classList.add("list-group-item");
-                    li.innerHTML = `<a href="episodes/${episode}" target="_blank">${episode.replace('.mp3', '')}</a>`;
+                    li.innerHTML = `<button class="btn btn-link episode-btn" data-src="episodes/${episode}">${episode.replace('.mp3', '')}</button>`;
                     list.appendChild(li);
                 });
             });
     });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    fetch('episodes.json')
+        .then(response => response.json())
+        .then(data => {
+            let episodes = data.episodes;
+            const playerElement = document.getElementById('player');
+            const sourceElement = document.getElementById('latest-episode');
+            const list = document.getElementById('episode-list');
+
+            if (episodes.length > 0) {
+                sourceElement.src = "episodes/" + episodes[0];
+                playerElement.load(); // Ensure the player refreshes
+                new Plyr('#player');
+            }
+
+            episodes.forEach((episode, index) => {
+                let li = document.createElement('li');
+                li.classList.add("list-group-item");
+                li.innerHTML = `<button class="btn btn-link episode-btn" data-src="episodes/${episode}">${episode.replace('.mp3', '')}</button>`;
+                list.appendChild(li);
+            });
+
+            // Add event listeners to buttons
+            document.querySelectorAll('.episode-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    sourceElement.src = event.target.getAttribute('data-src');
+                    playerElement.load(); // Reload the player with new source
+                    playerElement.play(); // Auto-play the selected episode
+                });
+            });
+        });
+});
 </script>
 
 </body>
