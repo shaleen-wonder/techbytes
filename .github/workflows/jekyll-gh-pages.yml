@@ -1,0 +1,28 @@
+name: Generate Episode List
+
+on:
+  push:
+    paths:
+      - 'episodes/*.mp3'
+
+permissions:
+  contents: write  # Grant write permission to the repository
+
+jobs:
+  update-episode-list:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Generate JSON
+        run: |
+          ls -t episodes/*.mp3 | awk -F '/' '{print "\"" $NF "\""}' | jq -s '{episodes: .}' > episodes.json
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add episodes.json
+          git commit -m "Update episode list" || exit 0
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
