@@ -5,6 +5,9 @@ on:
     paths:
       - 'episodes/*.mp3'
 
+permissions:
+  contents: write  # Grant write permission to the repository
+
 jobs:
   update-episode-list:
     runs-on: ubuntu-latest
