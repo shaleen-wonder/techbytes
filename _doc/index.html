@@ -20,7 +20,7 @@
                 let list = document.getElementById('episode-list');
                 data.episodes.forEach(episode => {
                     let li = document.createElement('li');
-                    li.innerHTML = `<a href="episodes/${episode}">${episode}</a>`;
+                    li.innerHTML = `<a href="../episodes/${episode}">${episode}</a>`;
                     list.appendChild(li);
                 });
             });
