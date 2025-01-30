@@ -1,0 +1,25 @@
+name: Generate Episode List
+
+on:
+  push:
+    paths:
+      - 'episodes/*.mp3'
+
+jobs:
+  update-episode-list:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Generate JSON
+        run: |
+          ls -t episodes/*.mp3 | awk -F'/' '{print "\"" $2 "\","}' | sed '$ s/,$//' | jq -s '{episodes: .}' > episodes.json
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "ashisa"
+          git config --global user.email "ashisa78@live.com"
+          git add episodes.json
+          git commit -m "Update episode list" || exit 0
+          git push
